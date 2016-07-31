@@ -46,7 +46,12 @@ public class CacheCouple {
         logger.debug("getInstance(File file)");
         if (instance == null) {
             instance = new CacheCouple();
-            instance.load();
+            try {
+                instance.load();
+            } catch (Exception ex) {
+                instance = null;
+                throw ex;
+            }
         }
         return instance;
     }
@@ -57,14 +62,14 @@ public class CacheCouple {
         setOptionCouples(makeOptionCouples(reader.read(OPTION_COUPLE_FILE_PATH)));
     }
     
-    private List<OptionCouple> makeOptionCouples(List<String> lines) {
+    private List<OptionCouple> makeOptionCouples(List<String> lines) throws IOException {
         List<OptionCouple> couples = new ArrayList<>();
         OptionCouple couple = null;
         for (String line : lines) {
             
             String[] ary = line.split(",", -1);
             if (ary.length < 4) {
-                
+                throw new IOException("length < 4");
             }
             String optionCode = ary[COL_PARENT_CODE];
             String optionGroupCode = ary[COL_PARENT_GROUP_CODE];
